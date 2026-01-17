@@ -77,6 +77,36 @@ func (s *TimeSortStrategy) Sort(files []FileEntry, reverse bool) {
 	})
 }
 
+type SizeSortStrategy struct{}
+
+func (s *SizeSortStrategy) Sort(files []FileEntry, reverse bool) {
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].IsDir != files[j].IsDir {
+			return files[i].IsDir
+		}
+		if reverse {
+			return files[i].Size < files[j].Size
+		}
+		return files[i].Size > files[j].Size
+	})
+}
+
+type ExtensionSortStrategy struct{}
+
+func (s *ExtensionSortStrategy) Sort(files []FileEntry, reverse bool) {
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].IsDir != files[j].IsDir {
+			return files[i].IsDir
+		}
+		extI := strings.ToLower(filepath.Ext(files[i].Name))
+		extJ := strings.ToLower(filepath.Ext(files[j].Name))
+		if reverse {
+			return extI > extJ
+		}
+		return extI < extJ
+	})
+}
+
 type GitRepository struct {
 	repoRoot string
 	repo     *git.Repository
@@ -221,6 +251,8 @@ func findGitRoot(start string) (string, error) {
 
 type Config struct {
 	SortModified    bool
+	SortSize        bool
+	SortExtension   bool
 	Reverse         bool
 	ShowGit         bool
 	ShowHidden      bool
@@ -245,7 +277,11 @@ func NewDirectoryLister(config Config) *DirectoryLister {
 	}
 
 	var sortStrat SortStrategy
-	if config.SortModified {
+	if config.SortSize {
+		sortStrat = &SizeSortStrategy{}
+	} else if config.SortExtension {
+		sortStrat = &ExtensionSortStrategy{}
+	} else if config.SortModified {
 		sortStrat = &TimeSortStrategy{}
 	} else {
 		sortStrat = &NameSortStrategy{}
@@ -452,12 +488,14 @@ Version: v1.0.0`,
 
 	rootCmd.Flags().BoolP("help", "", false, "help for lu")
 	rootCmd.Flags().BoolVarP(&config.SortModified, "sort-modified", "t", false, "sort by modified time (newest first)")
+	rootCmd.Flags().BoolVarP(&config.SortSize, "sort-size", "S", false, "sort by file size (largest first)")
+	rootCmd.Flags().BoolVarP(&config.SortExtension, "sort-extension", "X", false, "sort by file extension")
 	rootCmd.Flags().BoolVarP(&config.Reverse, "reverse", "r", false, "reverse sort order")
 	rootCmd.Flags().BoolVarP(&config.ShowGit, "git", "g", false, "show git status inline")
 	rootCmd.Flags().BoolVarP(&config.ShowHidden, "hidden", "h", false, "show hidden files")
 	rootCmd.Flags().BoolVarP(&config.ShowUser, "user", "u", false, "show user and group ownership metadata")
 	rootCmd.Flags().BoolVarP(&config.Recursive, "recursive", "R", false, "list subdirectories recursively")
-	rootCmd.Flags().IntVarP(&config.MaxDepth, "max-depth", "L", 0, "maximum recursion depth (0 = no limit, default: 100)")
+	rootCmd.Flags().IntVarP(&config.MaxDepth, "max-depth", "L", 0, "maximum recursion depth (0 = no limit, default: 30)")
 	rootCmd.Flags().StringSliceVarP(&config.IncludePatterns, "include", "i", nil, "include files matching glob patterns (quote the pattern)")
 	rootCmd.Flags().StringSliceVarP(&config.ExcludePatterns, "exclude", "x", nil, "exclude files matching glob patterns (quote the pattern)")
 	rootCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
@@ -878,6 +916,8 @@ func showColoredHelp(_ *cobra.Command) {
 		flag, desc string
 	}{
 		{"-t, --sort-modified", "sort by modified time (newest first)"},
+		{"-S, --sort-size", "sort by file size (largest first)"},
+		{"-X, --sort-extension", "sort by file extension"},
 		{"-r, --reverse", "reverse sort order"},
 		{"-g, --git", "show git status inline"},
 		{"-h, --hidden", "show hidden files"},

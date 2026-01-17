@@ -151,6 +151,62 @@ func TestTimeSortStrategy(t *testing.T) {
 	}
 }
 
+func TestSizeSortStrategy(t *testing.T) {
+	files := []FileEntry{
+		{Name: "small.txt", Size: 100, IsDir: false},
+		{Name: "large.txt", Size: 10000, IsDir: false},
+		{Name: "medium.txt", Size: 1000, IsDir: false},
+		{Name: "dir", Size: 0, IsDir: true},
+	}
+
+	strategy := &SizeSortStrategy{}
+	strategy.Sort(files, false)
+
+	if !files[0].IsDir || files[0].Name != "dir" {
+		t.Error("first item should be a directory")
+	}
+	if files[1].Name != "large.txt" {
+		t.Errorf("got %q, want 'large.txt'", files[1].Name)
+	}
+	if files[3].Name != "small.txt" {
+		t.Errorf("got %q, want 'small.txt'", files[3].Name)
+	}
+}
+
+func TestExtensionSortStrategy(t *testing.T) {
+	files := []FileEntry{
+		{Name: "file.txt", IsDir: false},
+		{Name: "document.pdf", IsDir: false},
+		{Name: "archive.tar.gz", IsDir: false},
+		{Name: "script.sh", IsDir: false},
+		{Name: "dir", IsDir: true},
+		{Name: "image.JPG", IsDir: false},
+	}
+
+	strategy := &ExtensionSortStrategy{}
+	strategy.Sort(files, false)
+
+	if !files[0].IsDir || files[0].Name != "dir" {
+		t.Error("first item should be a directory")
+	}
+	// Extensions sorted: .gz, .jpg, .pdf, .sh, .txt
+	if files[1].Name != "archive.tar.gz" {
+		t.Errorf("got %q, want 'archive.tar.gz'", files[1].Name)
+	}
+	if files[2].Name != "image.JPG" {
+		t.Errorf("got %q, want 'image.JPG'", files[2].Name)
+	}
+	if files[3].Name != "document.pdf" {
+		t.Errorf("got %q, want 'document.pdf'", files[3].Name)
+	}
+	if files[4].Name != "script.sh" {
+		t.Errorf("got %q, want 'script.sh'", files[4].Name)
+	}
+	if files[5].Name != "file.txt" {
+		t.Errorf("got %q, want 'file.txt'", files[5].Name)
+	}
+}
+
 func TestGetTerminalWidth(t *testing.T) {
 	width := getTerminalWidth()
 	if width <= 0 {
