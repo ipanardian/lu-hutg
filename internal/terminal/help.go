@@ -56,7 +56,7 @@ func ShowColoredHelp(_ *cobra.Command) {
 		"lu -ta",
 		"lu -i '*.go'",
 		"lu -x '*.tambang'",
-		"lu -hutg (Lord's mode)",
+		"lu -hut (Lord's mode)",
 	}
 
 	for _, ex := range examples {
