@@ -5,12 +5,13 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/ipanardian/lu-hut/internal/constants"
 	"github.com/spf13/cobra"
 )
 
 func ShowColoredHelp(_ *cobra.Command) {
 	fmt.Printf("\n%s %s\n\n",
-		color.New(color.FgCyan, color.Bold).Sprint("lu-hut v1.0.0"),
+		color.New(color.FgCyan, color.Bold).Sprint("lu-hut "+constants.Version),
 		color.New(color.FgHiWhite).Sprint("- a modern alternative to the Unix ls command with box-drawn tables, colors, filtering and git integration"),
 	)
 	fmt.Printf("%s\n\n", color.New(color.FgHiBlack).Sprint("GitHub: https://github.com/ipanardian/lu-hut"))

@@ -1,7 +1,6 @@
 # lu Makefile
 # GitHub: https://github.com/ipanardian/lu-hut
 # Author: Ipan Ardian
-# Version: v1.0.0
 
 .PHONY: build build-linux build-mac build-all install install-linux install-mac clean test help
 

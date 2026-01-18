@@ -6,7 +6,6 @@
 //
 // GitHub: https://github.com/ipanardian/lu-hut
 // Author: Ipan Ardian
-// Version: v1.0.0
 package main
 
 import (
@@ -14,6 +13,7 @@ import (
 	"os"
 
 	"github.com/ipanardian/lu-hut/internal/config"
+	"github.com/ipanardian/lu-hut/internal/constants"
 	"github.com/ipanardian/lu-hut/internal/lister"
 	"github.com/ipanardian/lu-hut/internal/terminal"
 	"github.com/spf13/cobra"
@@ -34,7 +34,7 @@ func newRootCommand() *cobra.Command {
 		Long: `lu-hut is a modern alternative to the Unix ls command with box-drawn tables, colors, filtering, and git integration.
 
 GitHub: https://github.com/ipanardian/lu-hut
-Version: v1.0.0`,
+Version: ` + constants.Version,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "."

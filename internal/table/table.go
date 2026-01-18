@@ -1,10 +1,4 @@
 // Package table provides a simple ASCII table formatter with customizable borders and colors.
-//
-// Coordinate first, complain later.
-//
-// GitHub: https://github.com/ipanardian/lu-hut
-// Author: Ipan Ardian
-// Version: v1.0.0
 package table
 
 import (
