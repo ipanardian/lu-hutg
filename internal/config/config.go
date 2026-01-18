@@ -13,6 +13,7 @@ type Config struct {
 	ShowUser        bool
 	ShowExactTime   bool
 	Recursive       bool
+	Tree            bool
 	MaxDepth        int
 	IncludePatterns []string
 	ExcludePatterns []string

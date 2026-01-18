@@ -1,6 +1,8 @@
-// Package main provides a modern alternative for the Unix ls command.
-// Displays file listings in a beautiful table format with colors,
-// filtering, git integration, and human-readable file sizes.
+// Package main initializes the lu-hut CLI application
+//
+// `lu-hut`is a powerful modern alternative to the Unix ls command that delivers directory listings
+// with beautiful box-drawn tables or stunning tree format, intelligent colors, multiple sorting strategies,
+// advanced filtering, and seamless git integration. Transform your file exploration from mundane to magnificent.
 //
 // Coordinate first, complain later.
 //
@@ -31,7 +33,7 @@ func newRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "lu [path]",
 		Short: "A modern alternative to the Unix ls command with table formatting",
-		Long: `lu-hut is a modern alternative to the Unix ls command with box-drawn tables, colors, filtering, and git integration.
+		Long: `lu-hut is a powerful modern alternative to the Unix ls command with beautiful box-drawn tables or stunning tree format, intelligent colors, multiple sorting strategies, advanced filtering, and seamless git integration.
 
 GitHub: https://github.com/ipanardian/lu-hut
 Version: ` + constants.Version,
@@ -65,6 +67,7 @@ Version: ` + constants.Version,
 	rootCmd.Flags().BoolVarP(&cfg.ShowHidden, "hidden", "h", false, "show hidden files")
 	rootCmd.Flags().BoolVarP(&cfg.ShowUser, "user", "u", false, "show user and group ownership metadata")
 	rootCmd.Flags().BoolVarP(&cfg.ShowExactTime, "exact-time", "T", false, "show exact modification time instead of relative")
+	rootCmd.Flags().BoolVarP(&cfg.Tree, "tree", "F", false, "display directory structure in a tree format")
 	rootCmd.Flags().BoolVarP(&cfg.Recursive, "recursive", "R", false, "list subdirectories recursively")
 	rootCmd.Flags().IntVarP(&cfg.MaxDepth, "max-depth", "L", 0, "maximum recursion depth (0 = no limit, default: 30)")
 	rootCmd.Flags().StringSliceVarP(&cfg.IncludePatterns, "include", "i", nil, "include files matching glob patterns (quote the pattern)")

@@ -139,7 +139,7 @@ func formatSize(size int64, isDir bool) string {
 func formatModified(t time.Time, now time.Time, showExact bool) string {
 	if showExact {
 		c := color.New(color.FgHiWhite)
-		return c.Sprint(t.Format("Jan 17 15:04:05"))
+		return c.Sprint(t.Format("Jan 17, 06 15:04"))
 	}
 
 	duration := now.Sub(t)

@@ -76,6 +76,10 @@ func (d *Lister) List(path string) error {
 		d.gitRepo, _ = git.NewRepository(absPath)
 	}
 
+	if d.config.Tree {
+		return d.listTree(ctx, absPath)
+	}
+
 	if d.config.Recursive {
 		return d.listRecursive(ctx, absPath)
 	}
@@ -93,6 +97,15 @@ func (d *Lister) List(path string) error {
 	renderer.Render(files, time.Now())
 
 	return nil
+}
+
+func (d *Lister) listTree(_ context.Context, rootPath string) error {
+	treeRenderer := renderer.NewTree(d.config)
+	if d.gitRepo != nil {
+		treeRenderer.SetGitRepo(d.gitRepo)
+	}
+	treeRenderer.SetFilter(d.filter)
+	return treeRenderer.Render(rootPath, time.Now())
 }
 
 func (d *Lister) listRecursive(ctx context.Context, rootPath string) error {

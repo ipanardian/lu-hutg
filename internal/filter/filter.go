@@ -53,3 +53,15 @@ func (f *Filter) shouldInclude(name string) bool {
 	}
 	return false
 }
+
+func (f *Filter) ShouldInclude(name string) bool {
+	return f.shouldInclude(name)
+}
+
+func (f *Filter) ShouldExclude(name string) bool {
+	return f.shouldExclude(name)
+}
+
+func (f *Filter) HasIncludePatterns() bool {
+	return len(f.includePatterns) > 0
+}

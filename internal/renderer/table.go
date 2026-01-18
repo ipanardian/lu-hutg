@@ -103,8 +103,8 @@ func (r *Table) columnConstraints() ([]int, []int) {
 	mins := []int{15, 6, 10, 10}
 	maxs := []int{50, 10, 15, 12}
 	if r.config.ShowExactTime {
-		mins[2] = 15
-		maxs[2] = 18
+		mins[2] = 16
+		maxs[2] = 17
 	}
 	if r.config.ShowGit {
 		mins = append(mins, 6)
