@@ -37,10 +37,11 @@
 
 ## 📸 Visual Preview
 
-<p align="center">
-	<img src="graphics/Screenshot-1.png" width="49%" alt="demo">
-	<img src="graphics/Screenshot-2.png" width="49%" alt="demo">
-</p>
+<div align="center">
+	<p>
+		<video controls muted src="https://github.com/user-attachments/assets/c1f63dfb-cce2-4d6b-88ea-8ff4206a991b"></video>
+	</p>
+</div>
 
 ## 🛠️ Operational Installation
 
