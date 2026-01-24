@@ -17,7 +17,7 @@
 
 - **Beautiful Box-Drawn Tables** - Clean, box-drawn tables with colored borders for excellent readability.
 - **Hierarchical Directory Priority** - Folders are prioritized at the top of the list for structured navigation.
-- **Stunning Tree View Display (-F)** - Display directory structure in a beautiful tree format with all features supported.
+- **Stunning Tree View Display (-F)** - Display directory structure in a beautiful tree format with all features supported. Tree view can be cancelled with `Ctrl+C`
 - **Dynamic Git Monitoring (-g)** - Real-time tracking of file states (Untracked, Modified, Added) directly in the table.
 - **Time-Aware Color Grading (-t)** - Intelligent color schemes based on file age to quickly identify recent changes.
 - **Exact Time Display (-T)** - Show precise modification timestamps instead of relative time.

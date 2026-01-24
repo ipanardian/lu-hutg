@@ -2,6 +2,7 @@
 package renderer
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -48,11 +49,24 @@ func (r *Tree) SetFilter(f *filter.Filter) {
 	r.filter = f
 }
 
-func (r *Tree) Render(path string, now time.Time) error {
-	return r.renderTreeRecursive(path, "", true, 0, now)
+func (r *Tree) Render(ctx context.Context, path string, now time.Time) error {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := r.renderTreeRecursive(ctx, path, "", true, 0, now)
+	if err == context.Canceled {
+		fmt.Println("\nOperation cancelled by user")
+		err = nil
+	}
+	return err
 }
 
-func (r *Tree) renderTreeRecursive(path string, prefix string, _ bool, level int, now time.Time) error {
+func (r *Tree) renderTreeRecursive(ctx context.Context, path string, prefix string, _ bool, level int, now time.Time) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
 	if r.config.MaxDepth > 0 && level >= r.config.MaxDepth {
 		if level == r.config.MaxDepth {
 			fmt.Printf("%s└── (max depth reached)\n", prefix)
@@ -100,7 +114,7 @@ func (r *Tree) renderTreeRecursive(path string, prefix string, _ bool, level int
 
 			for _, file := range files {
 				if file.IsDir {
-					if r.hasMatchingDescendants(file.Path) {
+					if r.hasMatchingDescendants(ctx, file.Path) {
 						filtered = append(filtered, file)
 					}
 				} else {
@@ -127,6 +141,10 @@ func (r *Tree) renderTreeRecursive(path string, prefix string, _ bool, level int
 	}
 
 	for i, file := range files {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+
 		isLast := i == len(files)-1
 		connector := "├── "
 		if isLast {
@@ -169,17 +187,21 @@ func (r *Tree) renderTreeRecursive(path string, prefix string, _ bool, level int
 			} else {
 				newPrefix += "│   "
 			}
-			r.renderTreeRecursive(file.Path, newPrefix, true, level+1, now)
+			r.renderTreeRecursive(ctx, file.Path, newPrefix, true, level+1, now)
 		}
 	}
 
 	return nil
 }
 
-func (r *Tree) hasMatchingDescendants(dirPath string) bool {
+func (r *Tree) hasMatchingDescendants(ctx context.Context, dirPath string) bool {
 	var result bool
 
 	filepath.WalkDir(dirPath, func(path string, d os.DirEntry, err error) error {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+
 		if err != nil {
 			return nil
 		}
@@ -204,6 +226,10 @@ func (r *Tree) hasMatchingDescendants(dirPath string) bool {
 
 		return nil
 	})
+
+	if ctx.Err() != nil {
+		return false
+	}
 
 	return result
 }
