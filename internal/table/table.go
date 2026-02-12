@@ -316,7 +316,8 @@ func truncateString(s string, maxLen int) string {
 		return ""
 	}
 
-	runes := []rune(s)
+	plain := stripANSI(s)
+	runes := []rune(plain)
 	if len(runes) <= maxLen {
 		return s
 	}
