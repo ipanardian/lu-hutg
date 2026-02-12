@@ -11,8 +11,10 @@ import (
 )
 
 type Repository struct {
-	repoRoot string
-	repo     *git.Repository
+	repoRoot     string
+	repo         *git.Repository
+	cachedStatus git.Status
+	statusLoaded bool
 }
 
 func NewRepository(path string) (*Repository, error) {
@@ -27,9 +29,25 @@ func NewRepository(path string) (*Repository, error) {
 	return &Repository{repoRoot: root, repo: repo}, nil
 }
 
-func (g *Repository) GetStatus(filePath string) string {
+func (g *Repository) loadStatus() error {
+	if g.statusLoaded {
+		return nil
+	}
 	worktree, err := g.repo.Worktree()
 	if err != nil {
+		return fmt.Errorf("getting worktree: %w", err)
+	}
+	status, err := worktree.Status()
+	if err != nil {
+		return fmt.Errorf("getting worktree status: %w", err)
+	}
+	g.cachedStatus = status
+	g.statusLoaded = true
+	return nil
+}
+
+func (g *Repository) GetStatus(filePath string) string {
+	if err := g.loadStatus(); err != nil {
 		return ""
 	}
 
@@ -38,17 +56,12 @@ func (g *Repository) GetStatus(filePath string) string {
 		return ""
 	}
 
-	relPath, err := filepath.Rel(worktree.Filesystem.Root(), absPath)
+	relPath, err := filepath.Rel(g.repoRoot, absPath)
 	if err != nil {
 		return ""
 	}
 
-	status, err := worktree.Status()
-	if err != nil {
-		return ""
-	}
-
-	fileStatus := status.File(relPath)
+	fileStatus := g.cachedStatus.File(relPath)
 
 	if fileStatus.Worktree == git.Untracked {
 		return "?"
