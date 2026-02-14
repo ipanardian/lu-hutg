@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/ipanardian/lu-hut/internal/config"
 	"github.com/ipanardian/lu-hut/internal/filter"
 	"github.com/ipanardian/lu-hut/internal/git"
@@ -28,6 +29,13 @@ type Lister struct {
 }
 
 func New(cfg config.Config) *Lister {
+	switch cfg.ColorMode {
+	case "never":
+		color.NoColor = true
+	case "always":
+		color.NoColor = false
+	}
+
 	filter := filter.NewFilter(cfg.IncludePatterns, cfg.ExcludePatterns)
 
 	var sortStrat sort.Strategy
@@ -177,8 +185,12 @@ func (d *Lister) listRecursive(ctx context.Context, rootPath string) error {
 
 		for _, file := range files {
 			if file.IsDir {
+				nextLevel := current.level + 1
+				if maxDepth > 0 && nextLevel >= maxDepth {
+					continue
+				}
 				dirPath := filepath.Join(current.path, file.Name)
-				dirs = append(dirs, dirEntry{path: dirPath, level: current.level + 1})
+				dirs = append(dirs, dirEntry{path: dirPath, level: nextLevel})
 			}
 		}
 	}
@@ -192,6 +204,7 @@ func (d *Lister) collectFiles(path string, entries []fs.DirEntry) []model.FileEn
 	for _, entry := range entries {
 		info, err := entry.Info()
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: cannot read %s: %v\n", entry.Name(), err)
 			continue
 		}
 

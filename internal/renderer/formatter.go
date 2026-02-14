@@ -13,6 +13,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/ipanardian/lu-hut/internal/model"
+	"github.com/ipanardian/lu-hut/pkg/helper"
 	"golang.org/x/term"
 )
 
@@ -38,28 +39,6 @@ func getTerminalWidth() int {
 	return 70
 }
 
-func stripANSI(s string) string {
-	var result strings.Builder
-	i := 0
-	for i < len(s) {
-		if s[i] == '\x1b' {
-			j := i + 1
-			if j < len(s) && s[j] == '[' {
-				j++
-				for j < len(s) && (s[j] < 'a' || s[j] > 'z') && (s[j] < 'A' || s[j] > 'Z') {
-					j++
-				}
-				j++
-			}
-			i = j
-		} else {
-			result.WriteByte(s[i])
-			i++
-		}
-	}
-	return result.String()
-}
-
 func calculateDisplayWidths(data [][]string) []int {
 	if len(data) == 0 {
 		return nil
@@ -69,7 +48,7 @@ func calculateDisplayWidths(data [][]string) []int {
 
 	for _, row := range data {
 		for j, cell := range row {
-			displayText := stripANSI(cell)
+			displayText := helper.StripANSI(cell)
 			width := utf8.RuneCountInString(displayText)
 			if width > widths[j] {
 				widths[j] = width
@@ -309,6 +288,7 @@ func formatPermissions(mode fs.FileMode, useOctal bool) string {
 
 	for i := 8; i >= 0; i-- {
 		bit := perm >> uint(i) & 1
+		group := (8 - i) / 3
 		var c *color.Color
 
 		switch (8 - i) % 3 {
@@ -329,20 +309,37 @@ func formatPermissions(mode fs.FileMode, useOctal bool) string {
 				result.WriteString(c.Sprint("-"))
 			}
 		case 2:
-			if bit == 1 {
-				if mode&fs.ModeSetuid != 0 {
-					c = color.New(color.FgMagenta, color.Bold)
-					result.WriteString(c.Sprint("s"))
-				} else if mode&fs.ModeSetgid != 0 {
-					c = color.New(color.FgMagenta, color.Bold)
-					result.WriteString(c.Sprint("s"))
-				} else if mode&fs.ModeSticky != 0 {
-					c = color.New(color.FgRed, color.Bold)
-					result.WriteString(c.Sprint("t"))
+			hasSpecial := false
+			switch group {
+			case 0:
+				hasSpecial = mode&fs.ModeSetuid != 0
+			case 1:
+				hasSpecial = mode&fs.ModeSetgid != 0
+			case 2:
+				hasSpecial = mode&fs.ModeSticky != 0
+			}
+
+			if hasSpecial {
+				if group == 2 {
+					if bit == 1 {
+						c = color.New(color.FgRed, color.Bold)
+						result.WriteString(c.Sprint("t"))
+					} else {
+						c = color.New(color.FgRed, color.Bold)
+						result.WriteString(c.Sprint("T"))
+					}
 				} else {
-					c = color.New(color.FgRed, color.Bold)
-					result.WriteString(c.Sprint("x"))
+					if bit == 1 {
+						c = color.New(color.FgMagenta, color.Bold)
+						result.WriteString(c.Sprint("s"))
+					} else {
+						c = color.New(color.FgMagenta, color.Bold)
+						result.WriteString(c.Sprint("S"))
+					}
 				}
+			} else if bit == 1 {
+				c = color.New(color.FgRed, color.Bold)
+				result.WriteString(c.Sprint("x"))
 			} else {
 				c = color.New(color.FgHiBlack)
 				result.WriteString(c.Sprint("-"))
