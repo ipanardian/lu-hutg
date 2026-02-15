@@ -5,6 +5,7 @@
 *.so
 *.dylib
 bin
+dist/
 
 # Test binary, built with `go test -c`
 *.test
@@ -28,7 +29,11 @@ go.work.sum
 # Editor/IDE
 .idea/
 .vscode/
-.github/
+
+# GitHub
+.github/*
+!.github/workflows/
+!.github/workflows/*.yml
 
 temp/
 .DS_Store
