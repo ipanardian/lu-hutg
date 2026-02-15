@@ -47,7 +47,14 @@
 
 ## 🛠️ Operational Installation
 
-### Quick Install (Recommended)
+### Homebrew (Recommended for macOS)
+
+```bash
+brew tap ipanardian/tap
+brew install lu-hut
+```
+
+### Quick Install Script
 
 **macOS and Linux:**
 
