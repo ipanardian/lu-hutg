@@ -13,7 +13,27 @@ import (
 
 const downloadTimeout = 5 * time.Minute
 
+func IsHomebrewInstallation() bool {
+	execPath, err := os.Executable()
+	if err != nil {
+		return false
+	}
+
+	execPath, _ = filepath.EvalSymlinks(execPath)
+
+	return strings.Contains(execPath, "/Cellar/") ||
+		strings.Contains(execPath, "homebrew") ||
+		strings.Contains(execPath, "/opt/homebrew/") ||
+		strings.Contains(execPath, "/usr/local/Cellar/")
+}
+
 func PerformUpdate(release *GitHubRelease) error {
+	if IsHomebrewInstallation() {
+		color.Yellow("⚠ lu-hut was installed via Homebrew")
+		color.Cyan("→ Please use 'brew upgrade lu-hut' to update")
+		return nil
+	}
+
 	downloadURL, err := FindAssetURL(release)
 	if err != nil {
 		return err
@@ -87,6 +107,13 @@ func PerformUpdate(release *GitHubRelease) error {
 }
 
 func PerformRollback() error {
+	if IsHomebrewInstallation() {
+		color.Yellow("⚠ lu-hut was installed via Homebrew")
+		color.Cyan("→ Rollback is not supported for Homebrew installations")
+		color.Cyan("→ Use 'brew install lu-hut@<version>' to install a specific version")
+		return nil
+	}
+
 	execPath, err := os.Executable()
 	if err != nil {
 		return fmt.Errorf("failed to get executable path: %w", err)
@@ -143,9 +170,16 @@ func CheckAndNotify() {
 			yellow("⚠"),
 			cyan(release.TagName),
 			currentVersion)
+
+		if IsHomebrewInstallation() {
+			fmt.Fprintf(os.Stderr, "%s Run %s to upgrade\n\n",
+				yellow("→"),
+				cyan("brew upgrade lu-hut"))
+		} else {
 		fmt.Fprintf(os.Stderr, "%s Run %s to upgrade\n\n",
 			yellow("→"),
 			cyan("lu update"))
+		}
 	}
 }
 
