@@ -33,7 +33,7 @@
 
 ---
 
-> **"Ingin menjadi Lord sang 'penguasa' terminal? pakailah `lu -hut`"**
+> **"Ingin menjadi Lord sang 'penguasa' terminal? pakailah `lu-hut`"**
 
 ---
 
@@ -65,7 +65,47 @@ $ make install
 
 Ensure `~/bin` is included in your system `PATH` for seamless execution.
 
-## 📋 Usage Protocol
+## 🚀 Updating & Rollback
+
+**Self-Update (Recommended):**
+
+```bash
+# Check current version and available updates
+$ lu version --check
+
+# Update to the latest version
+$ lu update
+
+# Rollback to the previous version if needed
+$ lu rollback
+```
+
+The update command will:
+
+- Check GitHub releases for the latest version
+- Download the appropriate binary for your system
+- Automatically replace the current binary
+- Create a backup of the previous version
+- Verify the installation
+
+**Rollback:**
+
+If you encounter issues after updating, you can easily rollback to the previous version:
+
+```bash
+$ lu rollback
+```
+
+The rollback command will:
+
+- Restore the previous version from backup
+- Verify the rollback was successful
+
+**Update Notifications:**
+
+lu-hut checks for updates in the background when you run any `lu` command (once every 24 hours) and displays a notification if a new version is available. Simply run `lu update` to upgrade.
+
+## 📝 Usage Protocol
 
 Execute the `lu` command to begin comprehensive directory monitoring.
 
@@ -123,7 +163,17 @@ $ lu -hut
 
 ```
 
-## ⚙️ Parameters (Flags)
+## ⚙️ Commands & Parameters
+
+### Commands
+
+| Command       | Description                                      |
+| :------------ | :----------------------------------------------- |
+| `lu update`   | Update lu to the latest version                  |
+| `lu rollback` | Rollback to the previous version                 |
+| `lu version`  | Show version information (`-c` to check updates) |
+
+### Flags
 
 | Flag   | Long Flag          | Description                                          |
 | :----- | :----------------- | :--------------------------------------------------- |
